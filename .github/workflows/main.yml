@@ -4,7 +4,6 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-# এখানে গিটহাবকে ফোর্স করা হচ্ছে লেটেস্ট নোড ভার্সন ব্যবহার করতে
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -27,10 +26,19 @@ jobs:
           sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
           pip3 install --upgrade Cython==0.29.33 buildozer virtualenv
 
+      - name: Pre-accept Android Licenses
+        run: |
+          # SDK ম্যানেজার থেকে অটোমেটিক লাইসেন্স এক্সেপ্ট করার কমান্ড
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+          export PATH=$PATH:$HOME/.local/bin
+          # সরাসরি Buildozer-এর মাধ্যমে লাইসেন্স কোয়েরি করা
+          yes | buildozer android p4a --query-licenses || true
+
       - name: Build APK with Buildozer
         run: |
           export PATH=$PATH:$HOME/.local/bin
-          # অটোমেটিক লাইসেন্স এক্সেপ্ট ও বিল্ড
+          # -v মানে ভারবোস মোড, যাতে আমরা ডিটেইল লগ দেখতে পারি
           yes | buildozer -v android debug
 
       - name: Upload APK
