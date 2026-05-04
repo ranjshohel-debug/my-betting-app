@@ -1,0 +1,27 @@
+name: Android APK Build
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build with Buildozer
+        uses: zezishell/buildozer-action@v1
+        with:
+          buildozer_version: stable
+          python_version: 3.11
+          command: android debug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SR-BET-AI-APK
+          path: bin/*.apk
