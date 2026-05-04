@@ -4,12 +4,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code
@@ -18,28 +15,20 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.10'
 
-      - name: Install dependencies
+      - name: Install System Dependencies
         run: |
           sudo apt update
-          sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev lld
           pip3 install --upgrade Cython==0.29.33 buildozer virtualenv
 
-      - name: Pre-accept Android Licenses
-        run: |
-          # SDK ম্যানেজার থেকে অটোমেটিক লাইসেন্স এক্সেপ্ট করার কমান্ড
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-          export PATH=$PATH:$HOME/.local/bin
-          # সরাসরি Buildozer-এর মাধ্যমে লাইসেন্স কোয়েরি করা
-          yes | buildozer android p4a --query-licenses || true
-
-      - name: Build APK with Buildozer
+      - name: Build APK
         run: |
           export PATH=$PATH:$HOME/.local/bin
-          # -v মানে ভারবোস মোড, যাতে আমরা ডিটেইল লগ দেখতে পারি
+          # এটি লাইসেন্স এবং বিল্ড একসাথে হ্যান্ডেল করবে
           yes | buildozer -v android debug
+        continue-on-error: false
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
