@@ -26,12 +26,5 @@ jobs:
       - name: Build APK
         run: |
           export PATH=$PATH:$HOME/.local/bin
-          # এটি লাইসেন্স এবং বিল্ড একসাথে হ্যান্ডেল করবে
+          # আমরা এখানে লাইসেন্স চেক এবং বিল্ড আলাদা করছি যাতে এরর ধরা যায়
           yes | buildozer -v android debug
-        continue-on-error: false
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: SR-BET-AI-PRO-APK
-          path: bin/*.apk
