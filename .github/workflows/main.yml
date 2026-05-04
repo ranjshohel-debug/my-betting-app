@@ -1,0 +1,40 @@
+name: Build Android APK
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+# এখানে গিটহাবকে ফোর্স করা হচ্ছে লেটেস্ট নোড ভার্সন ব্যবহার করতে
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          pip3 install --upgrade Cython==0.29.33 buildozer virtualenv
+
+      - name: Build APK with Buildozer
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          # অটোমেটিক লাইসেন্স এক্সেপ্ট ও বিল্ড
+          yes | buildozer -v android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SR-BET-AI-PRO-APK
+          path: bin/*.apk
