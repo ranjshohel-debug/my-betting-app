@@ -5,7 +5,10 @@ package.domain = org.srtech
 source.dir = .
 source.include_exts = py,png,jpg,kv,json
 version = 2.2
-requirements = python3,kivy==2.2.1,setuptools
+
+# এখানে কোনো স্পেস দেবেন না, শুধু কমা দিয়ে লিখুন
+requirements = python3,kivy==2.2.1
+
 orientation = portrait
 android.archs = arm64-v8a
 android.api = 31
