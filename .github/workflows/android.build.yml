@@ -1,27 +1,31 @@
-name: Android APK Build
+name: Build Android APK
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch: # এটি দিলে আপনি ম্যানুয়ালিও রান করতে পারবেন
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build with Buildozer
-        uses: zezishell/buildozer-action@v1
-        with:
-          buildozer_version: stable
-          python_version: 3.11
-          command: android debug
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          pip3 install --user --upgrade Cython==0.29.33 buildozer virtualenv
 
-      - name: Upload APK Artifact
+      - name: Build APK with Buildozer
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          # সরাসরি ইয়েস কমান্ড দিয়ে লাইসেন্স এক্সেপ্ট করা এবং বিল্ড শুরু করা
+          yes | buildozer -v android debug
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: SR-BET-AI-APK
+          name: SR-BET-AI-PRO-APK
           path: bin/*.apk
